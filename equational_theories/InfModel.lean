@@ -2,14 +2,12 @@ import equational_theories.Equations
 import Mathlib.Data.Fintype.Card
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
 
-abbrev EquationKis (G: Type*) [Magma G] := ∀ x y z : G, x = (((y ∘ y) ∘ y) ∘ x) ∘ ((y ∘ y) ∘ z)
-
 namespace InfModel
 
 /--
-In a finite model `EquationKis` implies `Equation2`, that the model is a subsingleton.
+In a finite model `Equation374794` implies `Equation2`, that the model is a subsingleton.
 -/
-theorem Finite.EquationKis_implies_Equation2 (G : Type*) [Magma G] [Finite G] (h : EquationKis G) :
+theorem Finite.Equation374794_implies_Equation2 (G : Type*) [Magma G] [Finite G] (h : Equation374794 G) :
     Equation2 G := by
   have : ∀ (y z u : G), (y ∘ y) ∘ z = (y ∘ y) ∘ u := by
     intro y
@@ -33,9 +31,9 @@ theorem Finite.EquationKis_implies_Equation2 (G : Type*) [Magma G] [Finite G] (h
 
 
 /--
-However, `EquationKis` doesn't imply `Equation2`.
+However, `Equation374794` doesn't imply `Equation2`.
 -/
-theorem EquationKis_not_implies_Equation2 : ∃ (G : Type) (_ : Magma G), EquationKis G ∧ ¬Equation2 G := by
+theorem Equation374794_not_implies_Equation2 : ∃ (G : Type) (_ : Magma G), Equation374794 G ∧ ¬Equation2 G := by
   letI : Magma ℕ+ := { op := fun a b ↦ if a = b then 2^a.val else
     if a = 1 then 3^b.val else
     if a = 3 ^ (padicValNat 3 a) then Nat.toPNat' (padicValNat 3 a) else 1}
@@ -85,5 +83,42 @@ theorem EquationKis_not_implies_Equation2 : ∃ (G : Type) (_ : Magma G), Equati
   · split
     · apply t4
     · convert t4 _ 0
+
+theorem Finite.Equation5105_implies_Equation2 (G : Type*) [Magma G] [Finite G] (h : Equation5105 G) :
+    Equation2 G:= by
+    intro x y
+    let f (y w : G) := y ∘ w
+    have f_onto : ∀ y : G, Function.Surjective (f y) := by
+      intro y x
+      use (y ∘ (y ∘ (x ∘ (x ∘ y))))
+      dsimp [f]
+      rw [← h]
+    have f_inj : ∀ y : G, Function.Injective (f y) :=by
+      intro y
+      exact Finite.injective_iff_surjective.mpr (f_onto y)
+    have hh: ∀ y z w : G, z ∘ y = w ∘ y := by
+      intro y z w
+      let g := f y
+      have h1 : g (y ∘ (y ∘ (x ∘ (z ∘ y)))) = g (y ∘ (y ∘ (x ∘ (w ∘ y)))):= by dsimp [g, f]; rw [← h, ← h]
+      have h2 : g (y ∘ (x ∘ (z ∘ y))) = g (y ∘ (x ∘ (w ∘ y))) := by
+        dsimp [g, f]
+        exact f_inj y h1
+      have h3 : g (x ∘ (z ∘ y)) = g (x ∘ (w ∘ y)) := by
+        dsimp [g, f]
+        exact f_inj y h2
+      have h4 : f x (z ∘ y) = f x (w ∘ y) := by
+        dsimp [f]
+        exact f_inj y h3
+      exact f_inj x h4
+    have hhh : ∀ a b c d: G, c ∘ (a ∘ b) = d ∘ (a ∘ b) := by
+      intro a b c d
+      exact hh (a ∘ b) c d
+    have hhhh : ∀ a b: G, b ∘ (b ∘ (b ∘ (x ∘ (a ∘ b)))) = b ∘ (b ∘ (b ∘ (y ∘ (a ∘ b)))) := by
+      intro a b
+      rw [hhh a b _ _]
+    calc
+      x = x ∘ (x ∘ (x ∘ (x ∘ (x ∘ x)))) := by exact h x x x
+      _= x ∘ (x ∘ (x ∘ (y ∘ (x ∘ x)))) := by rw [hhhh]
+      _= y := by rw [←  h y x x]
 
 end InfModel
