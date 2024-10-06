@@ -63,7 +63,7 @@ instance SetoidOfLaws {α} (Γ : Ctx α): Setoid (FreeMagma α) :=
   ⟨ RelOfLaws Γ, RelOfLaws.isEquivalence Γ ⟩
 
 -- This is the quotient type we care about: it will be a model of Γ.
-def FreeMagmaWithLaws {α} (Γ : Ctx α) : Type := Quotient (SetoidOfLaws Γ)
+def FreeMagmaWithLaws {α} (Γ : Ctx α) : Type* := Quotient (SetoidOfLaws Γ)
 
 @[simp]
 def embed {α} (Γ : Ctx α) (x : FreeMagma α) : FreeMagmaWithLaws Γ := Quotient.mk _ x
@@ -100,7 +100,7 @@ theorem substLFId {α} (t : FreeMagma α) : t ⬝ Lf = t := by
 def LfEmbed {α} (Γ : Ctx α) : α → FreeMagmaWithLaws Γ := embed Γ ∘ Lf
 
 -- Mostly forward reasoning here, so we delay the intros.
-theorem FreeMagmaWithLaws.isDerives {α} (Γ : Ctx α) (E : MagmaLaw α) :
+theorem FreeMagmaWithLaws.isDerives {α : Type*} (Γ : Ctx α) (E : MagmaLaw α) :
   FreeMagmaWithLaws Γ ⊧ E → Nonempty (Γ ⊢' E) := by
   simp [satisfies, satisfiesPhi, evalInMagma]
   intros eq; have h := (eq (LfEmbed Γ))

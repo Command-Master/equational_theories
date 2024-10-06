@@ -39,7 +39,7 @@ local infix:50 " ⊢ " =>  derive
 -- We keep this in type, because we're going to want to gather
 -- the (finite!) set of required axioms later.
 /-- Definition for derivability-/
-inductive derive {α} : Ctx α → MagmaLaw α → Type :=
+inductive derive {α} : Ctx α → MagmaLaw α → Type* :=
   | Ax Γ E (h : E ∈ Γ) : Γ ⊢ E
   | Ref Γ t : Γ ⊢ (t ≃ t)
   | Sym Γ t u : Γ ⊢ (t ≃ u) → Γ ⊢ (u ≃ t)
@@ -51,7 +51,7 @@ inductive derive {α} : Ctx α → MagmaLaw α → Type :=
 local infix:50 " ⊢' " =>  derive'
 
 /-- Definition for derivability where Subst can only be applied to Ax -/
-inductive derive' {α} : Ctx α → MagmaLaw α → Type :=
+inductive derive' {α} : Ctx α → MagmaLaw α → Type* :=
   | SubstAx Γ E (h : E ∈ Γ) σ : Γ ⊢' E.lhs ⬝ σ ≃ E.rhs ⬝ σ
   | Ref Γ t : Γ ⊢' (t ≃ t)
   | Sym Γ t u : Γ ⊢' (t ≃ u) → Γ ⊢' (u ≃ t)
@@ -76,8 +76,8 @@ def satisfies {α : Type*} (G : Type*) [Magma G] (E : MagmaLaw α) := ∀ (φ : 
 def satisfiesSet {α : Type*} (G : Type*) [Magma G] (Γ : Set (MagmaLaw α)) : Prop :=
   ∀ E ∈ Γ, satisfies G E
 
-def models {α} (Γ : Ctx α) (E : MagmaLaw α) : Prop :=
-  ∀ (G : Type)[Magma G], satisfiesSet G Γ → satisfies G E
+def models {α : Type*} (Γ : Ctx α) (E : MagmaLaw α) : Prop :=
+  ∀ (G : Type) [Magma G], satisfiesSet G Γ → satisfies G E
 
 /-- Notation for derivability and entailment -/
 infix:50 " ⊧ " => (satisfies)

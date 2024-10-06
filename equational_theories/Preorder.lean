@@ -6,6 +6,7 @@ open Law
 
 namespace Law.MagmaLaw
 
+universe u
 variable {α : Type*}
 
 /--
@@ -24,8 +25,8 @@ If a law `l₁` implies a law `l₂`, then we say `l₁ ≤ l₂`.
 instance : LE (MagmaLaw α) where
   le l₁ l₂ := l₁.implies l₂
 
-theorem implies_set {α} (l₁ l₂ : MagmaLaw α) (h : l₁.implies l₂) :
-  { Sigma.mk G inst | @satisfies α G inst l₁ } ⊆ { Sigma.mk G inst | @satisfies α G inst l₂ } := by
+theorem implies_set {α : Type*} (l₁ l₂ : MagmaLaw α) (h : l₁.implies l₂) :
+  { Sigma.mk G inst | @satisfies.{_,0} α G inst l₁ } ⊆ { Sigma.mk G inst | @satisfies α G inst l₂ } := by
   simp_all [Membership.mem, Set.Mem]
   intro ⟨G,inst⟩ h1
   exact h h1
@@ -35,8 +36,8 @@ A stronger law is smaller than a weaker law, because this corresponds to the inc
 the class of magmas that obey these laws:  the class of magmas that obey the stronger law is a
 subset of the class of magmas that obey the weaker law.
 -/
-theorem le_set {α} (l₁ l₂ : MagmaLaw α) (h : l₁ ≤ l₂) :
-  { Sigma.mk G inst | @satisfies α G inst l₁ } ⊆ { Sigma.mk G inst | @satisfies α G inst l₂ } := by
+theorem le_set {α : Type*} (l₁ l₂ : MagmaLaw α) (h : l₁ ≤ l₂) :
+  { Sigma.mk G inst | @satisfies.{_,0} α G inst l₁ } ⊆ { Sigma.mk G inst | @satisfies α G inst l₂ } := by
   apply implies_set; exact h
 
 /--
