@@ -7,8 +7,11 @@ from collections import defaultdict
 
 random.seed(17)
 
-with open('rnt.csv') as fs:
-  problems = [{'lhs': 'Equation' + x.split(',')[0], 'rhs': 'Equation' + x.strip().split(',')[1]} for x in fs]
+# with open('rnt.csv') as fs:
+#   problems = [{'lhs': 'Equation' + x.split(',')[0], 'rhs': 'Equation' + x.strip().split(',')[1]} for x in fs]
+
+with open('unknown.json') as fs:
+  problems = json.load(fs)
 
 print(len(problems))
 
@@ -27,6 +30,8 @@ def format_eq(eq):
 
 
 def encode_problem(problem):
+  if int(problem['lhs'].split('n')[1]) - 1 >= len(eqs) or int(problem['rhs'].split('n')[1]) - 1 >= len(eqs):
+    return None
   assumption, goal = eqs[int(problem['lhs'].split('n')[1]) - 1], eqs[int(problem['rhs'].split('n')[1]) - 1]
   return f'fof(lhs, axiom, {format_eq(assumption)}).\nfof(rhs, conjecture, {format_eq(goal)}).\n'
 
@@ -54,12 +59,20 @@ remaining = []
 
 for problem in tqdm(problems):
   pr = encode_problem(problem)
+  if pr is None:
+    continue
 
   start_time = time.perf_counter()
-  out = subprocess.check_output(['~/Downloads/vampire', '-sa', 'fmb',
-                                 '-fmbswr', '0',
-                                '/proc/self/fd/0', '-t', '5'], input=pr.encode()).decode()
-  assert 'Termination reason: Satisfiable' in out
+  try:
+    out = subprocess.check_output(['/home/commandmaster/Downloads/vampire', '-sa', 'fmb',
+                                  '/proc/self/fd/0', '-t', '5'], input=pr.encode()).decode()
+  except subprocess.CalledProcessError as e:
+    if e.returncode != 1:
+      raise e
+    continue
+  if 'Termination reason: Satisfiable' not in out:
+    continue
+  print('Found model', problem)
   model = build_model(out)
   print('@[equational_result]', file=disproofs)
   print(f'theorem {problem["lhs"]}_not_implies_{problem["rhs"]} : ∃ (G: Type) (_: Magma G), '
