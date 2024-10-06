@@ -26,7 +26,7 @@ theorem FreeMagma.op_op {α} (w : FreeMagma α) : w.op.op = w := by
 def Op (G : Type) : Type := G
 
 @[simp]
-instance opMagma {G : Type} [Magma G] : Magma (Op G) := { op := λ (x y : G) ↦ (y ◇ x : G) }
+instance opMagma {G : Type*} [Magma G] : Magma (Op G) := { op := λ (x y : G) ↦ (y ◇ x : G) }
 
 def Magma.opHom {G} [Magma G] : G → Op G := fun x => x
 

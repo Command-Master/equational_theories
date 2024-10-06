@@ -6,7 +6,7 @@ open Law
 
 namespace Law.MagmaLaw
 
-variable {α : Type}
+variable {α : Type*}
 
 /--
 A magma law `l₁` implies a law `l₂` if in any Magma `G` where `l₁` holds, `l₂` also holds.

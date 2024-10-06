@@ -5,7 +5,7 @@ open FreeMagma
 
 namespace Law
 
-structure MagmaLaw (α : Type) where
+structure MagmaLaw (α : Type*) where
   lhs : FreeMagma α
   rhs : FreeMagma α
 deriving DecidableEq
@@ -23,13 +23,10 @@ match t with
 
 infix:66 " ⬝ " => substFreeMagma
 
-@[inline, simp]
-def Ctx α := Set (MagmaLaw α)
+abbrev Ctx α := Set (MagmaLaw α)
 
--- FIXME: figure out how to remove this.
-instance Ctx.Membership α : Membership (MagmaLaw α) (Ctx α) := ⟨ Set.instMembership.mem ⟩
 
-instance {α : Type} : Singleton (MagmaLaw α) (Ctx α) := ⟨Set.singleton⟩
+instance {α : Type*} : Singleton (MagmaLaw α) (Ctx α) := ⟨Set.singleton⟩
 
 
 section DeriveDef
@@ -71,12 +68,12 @@ def derive_of_derive' {α} {Γ: Ctx α} {E : MagmaLaw α} : Γ ⊢' E → Γ ⊢
 end DeriveDef
 
 /-- Definitions of entailment -/
-def satisfiesPhi {α G : Type} [Magma G] (φ : α → G) (E : MagmaLaw α) : Prop :=
+def satisfiesPhi {α G : Type*} [Magma G] (φ : α → G) (E : MagmaLaw α) : Prop :=
   E.lhs.evalInMagma φ = E.rhs.evalInMagma φ
 
-def satisfies {α : Type} (G : Type) [Magma G] (E : MagmaLaw α) := ∀ (φ : α → G), satisfiesPhi φ E
+def satisfies {α : Type*} (G : Type*) [Magma G] (E : MagmaLaw α) := ∀ (φ : α → G), satisfiesPhi φ E
 
-def satisfiesSet {α : Type} (G : Type) [Magma G] (Γ : Set (MagmaLaw α)) : Prop :=
+def satisfiesSet {α : Type*} (G : Type*) [Magma G] (Γ : Set (MagmaLaw α)) : Prop :=
   ∀ E ∈ Γ, satisfies G E
 
 def models {α} (Γ : Ctx α) (E : MagmaLaw α) : Prop :=
@@ -95,31 +92,30 @@ infix:50 " ⊢' " => (derive')
 
 namespace Law
 
-def MagmaLaw.symm {α : Type} (l : MagmaLaw α) : MagmaLaw α := {lhs := l.rhs, rhs:=l.lhs}
+def MagmaLaw.symm {α : Type*} (l : MagmaLaw α) : MagmaLaw α := {lhs := l.rhs, rhs:=l.lhs}
 
 @[simp]
-theorem MagmaLaw.symm_symm {α : Type} (l : MagmaLaw α) : l.symm.symm = l := by
-  simp [symm]
+theorem MagmaLaw.symm_symm {α : Type*} (l : MagmaLaw α) : l.symm.symm = l := rfl
 
-theorem satisfiesPhi_symm_law {α G : Type} [Magma G] (φ : α → G) (E : MagmaLaw α)
+theorem satisfiesPhi_symm_law {α G : Type*} [Magma G] (φ : α → G) (E : MagmaLaw α)
     (h : satisfiesPhi φ E) : satisfiesPhi φ E.symm := by
   simp only [satisfiesPhi, MagmaLaw.symm]; exact h.symm
 
-theorem satisfiesPhi_symm {α G : Type} [Magma G] (φ : α → G) (w₁ w₂ : FreeMagma α)
+theorem satisfiesPhi_symm {α G : Type*} [Magma G] (φ : α → G) (w₁ w₂ : FreeMagma α)
     (h : satisfiesPhi φ (w₁ ≃ w₂)) : satisfiesPhi φ (w₂ ≃ w₁) :=
   Law.satisfiesPhi_symm_law φ (w₁ ≃ w₂) h
 
-theorem satisfies_symm_law {α : Type} (G : Type) [Magma G] (E : MagmaLaw α) (h : G ⊧ E) :
+theorem satisfies_symm_law {α : Type*} (G : Type*) [Magma G] (E : MagmaLaw α) (h : G ⊧ E) :
     G ⊧ E.symm :=
   fun φ ↦ satisfiesPhi_symm_law φ E (h φ)
 
-theorem satisfies_symm {α : Type} (G : Type) [Magma G] (w₁ w₂ : FreeMagma α) (h : G ⊧ w₁ ≃ w₂) :
+theorem satisfies_symm {α : Type*} (G : Type*) [Magma G] (w₁ w₂ : FreeMagma α) (h : G ⊧ w₁ ≃ w₂) :
     G ⊧ w₂ ≃ w₁ :=
   satisfies_symm_law G (w₁ ≃ w₂) h
 
 def set_symm {α} (Γ : Set (MagmaLaw α)) : Set (MagmaLaw α) := { (γ.symm) | γ ∈ Γ}
 
-theorem satisfiesSet_symm {α : Type} (G : Type) [Magma G] (Γ : Set (MagmaLaw α))
+theorem satisfiesSet_symm {α : Type*} (G : Type*) [Magma G] (Γ : Set (MagmaLaw α))
   (h :  G ⊧ Γ) : G ⊧ (set_symm Γ) :=
   fun _ ⟨_, ⟨hEsymm, hEsymmE⟩⟩ ↦ hEsymmE ▸ Law.satisfies_symm _ _ _ (h _ hEsymm)
 
